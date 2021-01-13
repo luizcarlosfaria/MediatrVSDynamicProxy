@@ -5,7 +5,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR.Pipeline;
-using Microsoft.Extensions.DependencyInjection;
 using Castle.DynamicProxy;
 using System.Runtime.CompilerServices;
 
@@ -37,36 +36,6 @@ namespace MediatrTesteConsoleApp
             var provider = services.BuildServiceProvider();
 
             return provider;
-        }
-    }
-
-    public static class Extensions
-    {
-        public static IServiceCollection AddSingletonWithProxy<IInterface, TImpl>(this IServiceCollection services)
-        where IInterface : class
-        where TImpl : IInterface
-        =>
-            services.AddSingleton(sp =>
-                sp.GetRequiredService<ProxyGenerator>()
-                .CreateInterfaceProxyWithTarget<IInterface>(sp.GetRequiredService<TImpl>(), new ExceptionLogInterceptor())
-            );
-
-    }
-
-
-    public class ExceptionLogInterceptor : IInterceptor
-    {
-        public void Intercept(IInvocation invocation)
-        {
-            try
-            {
-                invocation.Proceed();
-            }
-            catch (Exception exeption)
-            {
-                Console.WriteLine(exeption.ToString());
-                throw;
-            }
         }
     }
 }
