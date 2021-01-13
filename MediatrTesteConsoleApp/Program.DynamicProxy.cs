@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using MediatR.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
 using Castle.DynamicProxy;
+using System.Runtime.CompilerServices;
 
 namespace MediatrTesteConsoleApp
 {
@@ -14,7 +15,7 @@ namespace MediatrTesteConsoleApp
     {
         public static void MainExample(string[] args)
         {
-           
+
             var serviceProvider = BuildServiceProvider();
 
             serviceProvider.GetRequiredService<IServico1>().Teste(0);
@@ -26,15 +27,32 @@ namespace MediatrTesteConsoleApp
             var services = new ServiceCollection();
 
             services.AddSingleton<IServico1, Servico1>();
+            
+            services.AddSingleton<Servico2>();
 
-            services.AddSingleton<IServico2>(sp => {
-                var proxyGen = new ProxyGenerator();
-                return proxyGen.CreateInterfaceProxyWithTarget<IServico2>(new Servico2(), new ExceptionLogInterceptor());
-            });
+            services.AddSingleton<ProxyGenerator>();
+
+            services.AddSingletonWithProxy<IServico2, Servico2>();
 
             var provider = services.BuildServiceProvider();
 
             return provider;
+        }
+    }
+
+    public static class Extensions
+    {
+        public static ServiceCollection AddSingletonWithProxy<IInterface, TImpl>(this ServiceCollection services)
+        where IInterface : class
+        where TImpl: IInterface
+        {
+            services.AddSingleton(sp =>
+            {
+                var proxyGen = new ProxyGenerator();
+                return proxyGen.CreateInterfaceProxyWithTarget<IInterface>(sp.GetRequiredService<TImpl>(), new ExceptionLogInterceptor());
+            });
+
+            return services;
         }
     }
 
