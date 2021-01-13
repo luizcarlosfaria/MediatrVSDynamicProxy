@@ -26,12 +26,12 @@ namespace MediatrTesteConsoleApp
         {
             var services = new ServiceCollection();
 
-            services.AddSingleton<IServico1, Servico1>();
-
             services.AddSingleton<Servico2>();
+            services.AddSingleton<Servico1>();
 
             services.AddSingleton<ProxyGenerator>();
 
+            services.AddSingletonWithProxy<IServico1, Servico1>();
             services.AddSingletonWithProxy<IServico2, Servico2>();
 
             var provider = services.BuildServiceProvider();
