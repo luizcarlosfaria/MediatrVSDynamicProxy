@@ -27,7 +27,7 @@ namespace MediatrTesteConsoleApp
             var services = new ServiceCollection();
 
             services.AddSingleton<IServico1, Servico1>();
-            
+
             services.AddSingleton<Servico2>();
 
             services.AddSingleton<ProxyGenerator>();
@@ -42,18 +42,15 @@ namespace MediatrTesteConsoleApp
 
     public static class Extensions
     {
-        public static ServiceCollection AddSingletonWithProxy<IInterface, TImpl>(this ServiceCollection services)
+        public static IServiceCollection AddSingletonWithProxy<IInterface, TImpl>(this IServiceCollection services)
         where IInterface : class
-        where TImpl: IInterface
-        {
+        where TImpl : IInterface
+        =>
             services.AddSingleton(sp =>
-            {
-                var proxyGen = new ProxyGenerator();
-                return proxyGen.CreateInterfaceProxyWithTarget<IInterface>(sp.GetRequiredService<TImpl>(), new ExceptionLogInterceptor());
-            });
+                sp.GetRequiredService<ProxyGenerator>()
+                .CreateInterfaceProxyWithTarget<IInterface>(sp.GetRequiredService<TImpl>(), new ExceptionLogInterceptor())
+            );
 
-            return services;
-        }
     }
 
 
