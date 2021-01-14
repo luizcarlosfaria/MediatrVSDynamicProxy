@@ -14,10 +14,7 @@ namespace MediatrTesteConsoleApp
     {
         public static void MainExample(string[] args)
         {
-
-            var serviceProvider = BuildServiceProvider();
-
-            serviceProvider.GetRequiredService<IServico1>().Teste(0);
+            BuildServiceProvider().GetRequiredService<IServico1>().Teste(0);
         }
 
 
